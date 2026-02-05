@@ -221,10 +221,29 @@
             cursor: pointer;
             font-weight: bold;
             transition: all 0.3s;
+            margin-left: 10px;
         }
 
         .btn-logout:hover {
             background: #ff6b6b;
+            color: #000;
+        }
+
+        .btn-home {
+            background: rgba(0, 255, 136, 0.2);
+            border: 2px solid #00ff88;
+            color: #00ff88;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-home:hover {
+            background: #00ff88;
             color: #000;
         }
 
@@ -412,7 +431,10 @@
                 <h1>🧠 PHANTOM AI Dashboard</h1>
                 <div class="welcome-text" id="welcomeText">Welcome back!</div>
                 <div class="email-text" id="emailText"></div>
-                <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+                <div style="margin-top: 15px;">
+                    <a href="https://sainionhacks.github.io/phantom-ai-website/" class="btn-home">🏠 Back to Home</a>
+                    <button class="btn-logout" onclick="logout()">🚪 Logout</button>
+                </div>
             </div>
 
             <!-- Stats Cards -->
