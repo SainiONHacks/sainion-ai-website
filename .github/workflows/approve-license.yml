@@ -186,31 +186,35 @@ jobs:
         if: steps.auth.outputs.authorized == 'true'
         run: |
           TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          LICENSE_KEY="${{ steps.generate.outputs.license_key }}"
+          TIER="${{ steps.calc.outputs.tier }}"
+          EXPIRES="${{ steps.calc.outputs.expires }}"
+          DAYS="${{ steps.calc.outputs.days }}"
+          EMAIL="${{ steps.parse.outputs.email }}"
+          ACTOR="${{ github.event.sender.login }}"
           
           gh issue comment ${{ github.event.issue.number }} \
             --body "## License Approved!
-
-### License Details
-
-| Field | Value |
-|-------|-------|
-| **License Key** | \`${{ steps.generate.outputs.license_key }}\` |
-| **Tier** | **${{ steps.calc.outputs.tier }}** |
-| **Expires** | ${{ steps.calc.outputs.expires }} |
-| **Duration** | ${{ steps.calc.outputs.days }} days |
-| **Email** | ${{ steps.parse.outputs.email }} |
-
-### Status
-- License generated successfully
-- Added to \`licenses.json\`
-- Pushed to repository
-- User can activate immediately
-
-### Next Steps
-Send this license key to the customer via email.
-
----
-*Approved by @${{ github.event.sender.login }} on $TIMESTAMP*" \
+          
+          ### License Details
+          
+          - **License Key:** \`${LICENSE_KEY}\`
+          - **Tier:** **${TIER}**
+          - **Expires:** ${EXPIRES}
+          - **Duration:** ${DAYS} days
+          - **Email:** ${EMAIL}
+          
+          ### Status
+          - ✅ License generated successfully
+          - ✅ Added to licenses.json
+          - ✅ Pushed to repository
+          - ✅ User can activate immediately
+          
+          ### Next Steps
+          Send this license key to the customer via email.
+          
+          ---
+          *Approved by @${ACTOR} on ${TIMESTAMP}*" \
             --repo ${{ github.repository }}
           
           # Add success label and close issue
@@ -223,17 +227,21 @@ Send this license key to the customer via email.
       - name: Handle Failure
         if: failure() && steps.auth.outputs.authorized == 'true'
         run: |
+          REPO="${{ github.repository }}"
+          RUN_ID="${{ github.run_id }}"
+          
           gh issue comment ${{ github.event.issue.number }} \
             --body "**License approval failed!**
-            
-Please check the [workflow logs](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.
-
-Common issues:
-- Invalid email format
-- Duplicate license
-- Repository write permission denied
-
-Please retry or contact system administrator." \
+          
+          Please check the workflow logs for details:
+          https://github.com/${REPO}/actions/runs/${RUN_ID}
+          
+          Common issues:
+          - Invalid email format
+          - Duplicate license
+          - Repository write permission denied
+          
+          Please retry or contact system administrator." \
             --repo ${{ github.repository }}
           
           gh issue label add ${{ github.event.issue.number }} "failed" --repo ${{ github.repository }}
