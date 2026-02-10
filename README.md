@@ -1,11 +1,11 @@
-# 🧠 PHANTOM AI - Public Website Repository
+# 🧠 SAINION AI - Public Website Repository
 
 ## 📄 Repository Contents
 
 This is the **PUBLIC** repository for PHANTOM AI's marketing website and documentation.
 
 ### 🌐 Live Website
-**URL:** https://SainiONHacks.github.io/phantom-ai-website/
+**URL:** https://SainiONHacks.github.io/sainion-ai-website/
 
 ---
 
