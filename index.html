@@ -123,6 +123,25 @@
             text-shadow: none;
         }
 
+        .btn-admin {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-admin:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.5);
+            color: white !important;
+            text-shadow: none;
+        }
+
         /* Hero Section */
         .hero {
             text-align: center;
@@ -777,9 +796,26 @@
                 <a href="#pricing">Pricing</a>
                 <a href="#download">Download</a>
                 <a href="dashboard.html" class="btn-login">👤 Dashboard</a>
+                <a href="#" class="btn-admin" onclick="event.preventDefault();showAdminLogin()">🔐 Admin</a>
             </nav>
         </div>
     </header>
+
+    <!-- Admin Login Modal -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content">
+            <span class="modal-close" onclick="closeAdminModal()">&times;</span>
+            <h2 style="text-align:center; color:#00ff88;">🔐 Admin Access</h2>
+            <div class="form-group">
+                <label>Admin Password</label>
+                <input type="password" id="adminPassword" placeholder="Enter admin password"
+                    onkeypress="if(event.key==='Enter')checkAdminPassword()">
+            </div>
+            <button class="btn" onclick="checkAdminPassword()">Login</button>
+            <div id="adminError" style="color:#ff6b6b; text-align:center; margin-top:10px; display:none;">Invalid
+                password!</div>
+        </div>
+    </div>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -983,7 +1019,8 @@
             <div class="note-box">
                 <h3>⚠️ Important Notes</h3>
                 <ul>
-                    <li><strong>🔑 API Keys Required:</strong> You need your own API keys (Gemini, OpenAI, Claude, or Groq) - We don't provide API keys</li>
+                    <li><strong>🔑 API Keys Required:</strong> You need your own API keys (Gemini, OpenAI, Claude, or
+                        Groq) - We don't provide API keys</li>
                     <li><strong>Regular Updates:</strong> Get the latest features and improvements during your license
                         period</li>
                     <li><strong>Instant Activation:</strong> Receive license key via email within 24 hours after payment
@@ -1246,8 +1283,40 @@
         // Close modal when clicking outside
         window.onclick = function (event) {
             const modal = document.getElementById('purchaseModal');
+            const adminModal = document.getElementById('adminModal');
             if (event.target === modal) {
                 closePurchaseForm();
+            }
+            if (event.target === adminModal) {
+                closeAdminModal();
+            }
+        }
+
+        // Admin Functions
+        const ADMIN_PASSWORD = "admin@123"; // Change this to your secure password
+
+        function showAdminLogin() {
+            document.getElementById('adminModal').style.display = 'flex';
+            document.getElementById('adminPassword').value = '';
+            document.getElementById('adminError').style.display = 'none';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                // Correct password - redirect to admin dashboard
+                window.location.href = 'admin_dashboard.html';
+            } else {
+                // Wrong password - show error
+                document.getElementById('adminError').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+                setTimeout(() => {
+                    document.getElementById('adminError').style.display = 'none';
+                }, 3000);
             }
         }
     </script>
