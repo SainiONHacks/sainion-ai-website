@@ -471,9 +471,28 @@
                     <label for="adminPassword">Admin Password</label>
                     <input type="password" id="adminPassword" placeholder="Enter admin password" required
                         autocomplete="current-password">
+                    <small style="color: #00d4ff; margin-top: 5px; display: block;">
+                        💡 Use <strong>View Password</strong> for read-only access or <strong>Edit Password</strong> for
+                        full control
+                    </small>
                 </div>
                 <button type="submit" class="btn">🔓 Login</button>
                 <div class="error" id="loginError"></div>
+
+                <div
+                    style="margin-top: 20px; padding: 15px; background: rgba(0, 255, 136, 0.1); border-radius: 10px; border: 1px solid rgba(0, 255, 136, 0.3);">
+                    <p style="color: #00ff88; font-size: 14px; margin: 5px 0;"><strong>🔍 View-Only Access:</strong></p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• View all users and purchases</p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• View activity logs</p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• Cannot edit or delete data</p>
+
+                    <p style="color: #ff8800; font-size: 14px; margin: 15px 0 5px 0;"><strong>✏️ Edit Access:</strong>
+                    </p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• Full admin control</p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• Edit and delete users/purchases</p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• Generate licenses</p>
+                    <p style="color: #ccc; font-size: 13px; margin: 5px 0;">• Change passwords</p>
+                </div>
             </form>
         </div>
     </div>
@@ -657,13 +676,15 @@
 
     <script>
         // Configuration - CHANGE THESE VALUES
-        const ADMIN_PASSWORD = 'admin@123'; // Change this in production!
+        const ADMIN_PASSWORD = 'admin@123'; // Full edit access - Change this in production!
+        const VIEW_PASSWORD = 'view@123'; // Read-only access - Change this in production!
         const SESSION_TIMEOUT = 30 * 60 * 1000; // 30 minutes
         const MAX_LOGIN_ATTEMPTS = 5;
         const LOCKOUT_TIME = 5 * 60 * 1000; // 5 minutes
 
         let sessionTimer;
         let isLoggedIn = false;
+        let isViewOnly = false; // Track if user has view-only access
         let loginAttempts = 0;
         let lockoutUntil = 0;
 
@@ -754,12 +775,28 @@
 
             if (password === ADMIN_PASSWORD) {
                 isLoggedIn = true;
+                isViewOnly = false; // Full edit access
                 loginAttempts = 0;
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                document.querySelector('.header h1').innerHTML = '👑 Admin Dashboard <span style="color:#00ff88;">(Full Access)</span>';
                 loadDashboardData();
                 startSessionTimer();
-                logActivity('Admin', 'Login', 'Admin logged in successfully');
+                logActivity('Admin', 'Login (Full)', 'Admin logged in with full edit access');
+            } else if (password === VIEW_PASSWORD) {
+                isLoggedIn = true;
+                isViewOnly = true; // Read-only access
+                loginAttempts = 0;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.querySelector('.header h1').innerHTML = '👁️ Admin Dashboard <span style="color:#00d4ff;">(View Only)</span>';
+                // Hide edit buttons for view-only users
+                document.querySelectorAll('.btn-danger, .btn-success, [onclick*="showLicenseGenerator"], [onclick*="showChangePassword"]').forEach(btn => {
+                    btn.style.display = 'none';
+                });
+                loadDashboardData();
+                startSessionTimer();
+                logActivity('Viewer', 'Login (View)', 'User logged in with view-only access');
             } else {
                 loginAttempts++;
                 if (loginAttempts >= MAX_LOGIN_ATTEMPTS) {
