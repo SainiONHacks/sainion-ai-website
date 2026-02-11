@@ -217,11 +217,8 @@
             </p>
         </div>
 
-        <div class="payment-button-container">
-            <form>
-                <script src="https://checkout.razorpay.com/v1/payment-button.js"
-                    data-payment_button_id="pl_SEt10UdzCvhYrN" async> </script>
-            </form>
+        <div class="payment-button-container" id="paymentButtonContainer">
+            <!-- Razorpay button will be dynamically loaded based on selected plan -->
         </div>
 
         <div class="loading" id="loading">
@@ -241,56 +238,101 @@
     </div>
 
     <script>
-        // Plans configuration
+        // Plans configuration with Razorpay button IDs
         const PLANS = {
             'demo': {
                 name: 'Free Demo',
                 price: 0,
                 duration: '6 Hours',
+                buttonId: null, // Free plan - no payment needed
                 features: ['Voice Recognition', 'Interview Assistant', 'Resume Analyzer', 'Web Search', 'Perfect for Testing']
             },
             'first-time': {
                 name: 'First Time Plan',
                 price: 100,
-                duration: 'Full Day Access (First Purchase Only)',
+                duration: '1 Day Access (First Purchase Only)',
+                buttonId: 'pl_SEtLhkfcx49kSi',
                 features: ['Full Feature Access', 'All AI Models', 'Voice Recognition', 'Interview Assistant', 'Resume Analyzer', 'Web Search']
             },
             'daily': {
                 name: 'Daily Plan',
-                price: 300,
+                price: 200,
                 duration: '1 Day Access',
+                buttonId: 'pl_SEtT3LANYzhigE',
                 features: ['Full Feature Access', 'All AI Models', 'Voice Recognition', 'Interview Assistant', 'Resume Analyzer', 'Web Search']
+            },
+            '3-days': {
+                name: '3 Days Plan',
+                price: 500,
+                duration: '3 Days Access',
+                buttonId: 'pl_SEtV7cWYdR7gxV',
+                features: ['Full Feature Access', 'All AI Models', 'Voice Recognition', 'Interview Assistant', 'Resume Analyzer', 'Great Value']
             },
             '15-days': {
                 name: '15 Days Plan',
-                price: 1000,
+                price: 1500,
                 duration: '15 Days Access',
+                buttonId: 'pl_SEtWSEjE0XzYFK',
                 features: ['Full Feature Access', 'All AI Models', 'Priority Support', 'Voice Recognition', 'Interview Assistant', 'Best Value']
             },
             'monthly': {
                 name: '1 Month Plan',
                 price: 2000,
-                duration: '1 Month Access',
-                features: ['Full Feature Access', 'All AI Models', 'Priority Support', 'Regular Updates', 'Best for Professional Use']
-            }
-        };
+                duration: '1 and payment button
+        function loadPlanDetails() {
+                const planType = getURLParameter('plan') || 'daily';
+        const plan = PLANS[planType] || PLANS['daily'];
 
-        // Get plan from URL parameters
-        function getURLParameter(name) {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get(name);
+        document.getElementById('planName').textContent = plan.name;
+        document.getElementById('planPrice').textContent = `₹${plan.price}`;
+        document.getElementById('planDuration').textContent = plan.duration;
+
+        const featuresList = document.getElementById('planFeatures');
+        featuresList.innerHTML = '';
+        plan.features.forEach(feature => {
+            const li = document.createElement('li');
+            li.textContent = feature;
+            featuresList.appendChild(li);
+        });
+
+        // Load appropriate Razorpay button
+        loadPaymentButton(plan.buttonId, planType);
+
+        // Store plan info for payment callback
+        sessionStorage.setItem('selectedPlan', JSON.stringify({
+            type: planType,
+            ...plan
+        }));
         }
 
-        // Load plan details
-        function loadPlanDetails() {
-            const planType = getURLParameter('plan') || 'daily';
-            const plan = PLANS[planType] || PLANS['daily'];
+        // Load Razorpay payment button
+        function loadPaymentButton(buttonId, planType) {
+            const container = document.getElementById('paymentButtonContainer');
+            container.innerHTML = '';
 
-            document.getElementById('planName').textContent = plan.name;
-            document.getElementById('planPrice').textContent = `₹${plan.price}`;
-            document.getElementById('planDuration').textContent = plan.duration;
-
-            const featuresList = document.getElementById('planFeatures');
+            if (!buttonId) {
+                // Free demo plan
+                const demoButton = document.createElement('button');
+                demoButton.textContent = '🎁 Get Free Demo License';
+                demoButton.className = 'razorpay-payment-button';
+                demoButton.onclick = function () {
+                    // Generate free demo license
+                    handlePaymentSuccess({
+                        razorpay_payment_id: 'DEMO_' + Date.now(),
+                        razorpay_signature: 'demo_free'
+                    });
+                };
+                container.appendChild(demoButton);
+            } else {
+                // Paid plan - load Razorpay button
+                const form = document.createElement('form');
+                const script = document.createElement('script');
+                script.src = 'https://checkout.razorpay.com/v1/payment-button.js';
+                script.setAttribute('data-payment_button_id', buttonId);
+                script.async = true;
+                form.appendChild(script);
+                container.appendChild(form);
+            }t featuresList = document.getElementById('planFeatures');
             featuresList.innerHTML = '';
             plan.features.forEach(feature => {
                 const li = document.createElement('li');
@@ -340,7 +382,8 @@
                 paymentId: response.razorpay_payment_id || 'DEMO_' + Date.now(),
                 status: 'active'
             };
-
+            3 - days': 3 * 24 * 60 * 60 * 1000, // 3 days
+            '
             // Store purchase
             localStorage.setItem('currentLicense', JSON.stringify(purchaseData));
 

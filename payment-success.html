@@ -815,37 +815,65 @@ transform: rotate(360deg);
             }
 
             // Call backend webhook to send license email
-            // NOTE: Replace with your actual webhook URL after deployment
-            const webhookUrl = 'https://Nitinsaini077.pythonanywhere.com/webhook/payment-success';
+            // For local testing: http://localhost:5000/api/send-license
+            // For production: https://your-domain.com/api/send-license
+            const webhookUrl = 'http://localhost:5000/api/send-license';
 
-            const paymentData = {
-                order_id: orderId,
-                transaction_id: `PayU-${Date.now()}`,
+            const licenseData = {
                 email: email,
-                name: pendingOrder ? pendingOrder.name : 'Customer',
-                plan: plan,
-                amount: amount ? amount.replace('₹', '') : '500',
-                status: 'success',
-                timestamp: new Date().toISOString()
+                license_data: {
+                    license_key: licenseKey,
+                    plan_name: plan || '3 Days Plan',
+                    purchase_date: new Date().toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }),
+                    expiry_date: calculateExpiryDate(plan),
+                    amount: amount ? `₹${amount}` : '₹500'
+                }
             };
 
-            console.log('Sending license email...', paymentData);
+            console.log('📧 Sending license email...', licenseData);
 
             fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(paymentData)
+                body: JSON.stringify(licenseData)
             })
                 .then(response => response.json())
                 .then(data => {
-                    console.log('✅ License email sent:', data);
+                    if (data.success) {
+                        console.log('✅ License email sent successfully!');
+                    } else {
+                        console.warn('⚠️ Email sending failed:', data.message);
+                    }
                 })
                 .catch(error => {
-                    console.error('❌ Email sending failed:', error);
-                    console.log('User will still see license key on screen');
+                    console.error('❌ Email sending error:', error);
+                    console.log('ℹ️ User can still copy license key from screen');
                 });
+        }
+
+        function calculateExpiryDate(plan) {
+            const now = new Date();
+            const expiryMap = {
+                '6 Hour Demo': 6 * 60 * 60 * 1000,
+                'First Time Plan': 24 * 60 * 60 * 1000,
+                'Daily Plan': 24 * 60 * 60 * 1000,
+                '3 Days Plan': 3 * 24 * 60 * 60 * 1000,
+                '15 Days Plan': 15 * 24 * 60 * 60 * 1000,
+                '1 Month Plan': 30 * 24 * 60 * 60 * 1000
+            };
+            const milliseconds = expiryMap[plan] || 3 * 24 * 60 * 60 * 1000;
+            const expiryDate = new Date(now.getTime() + milliseconds);
+            return expiryDate.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
         }
 
         function saveLicenseToLocalStorage(licenseKey, plan, orderId) {
