@@ -833,32 +833,69 @@
             messageDiv.className = 'success';
             messageDiv.textContent = '✅ Creating account and sending verification email...';
 
-            setTimeout(() => {
-                // Note: In production, this should call backend API to create account
-                // For demo purposes, storing in localStorage (requires verification in production)
-                const user = {
+            // Send verification email via webhook
+            fetch('http://localhost:5000/webhook/send-verification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
                     email: email,
-                    name: name,
-                    verified: false, // Email not verified yet
-                    usage_stats: {
-                        total_sessions: 0,
-                        total_queries: 0
-                    },
-                    licenses: []
-                };
+                    name: name
+                })
+            }).then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Store unverified user
+                        const user = {
+                            email: email,
+                            name: name,
+                            verified: false, // Email not verified yet
+                            usage_stats: {
+                                total_sessions: 0,
+                                total_queries: 0
+                            },
+                            licenses: []
+                        };
 
-                // Store unverified user
-                localStorage.setItem('phantom_user_pending', JSON.stringify(user));
+                        localStorage.setItem('phantom_user_pending', JSON.stringify(user));
 
-                messageDiv.className = 'success';
-                messageDiv.innerHTML = '✅ Account created!<br>📧 Please check your email (' + email + ') to verify your account.<br>⚠️ You must verify your email before logging in.';
+                        messageDiv.className = 'success';
+                        messageDiv.innerHTML = '✅ Account created!<br>📧 <strong>Verification email sent to ' + email + '</strong><br>⚠️ Please check your email (including spam folder) and click the verification link.<br>You must verify your email before logging in.';
 
-                // Clear form
-                document.getElementById('signupName').value = '';
-                document.getElementById('signupEmail').value = '';
-                document.getElementById('signupPassword').value = '';
-                document.getElementById('signupConfirm').value = '';
-            }, 1500);
+                        // Clear form
+                        document.getElementById('signupName').value = '';
+                        document.getElementById('signupEmail').value = '';
+                        document.getElementById('signupPassword').value = '';
+                        document.getElementById('signupConfirm').value = '';
+                    } else {
+                        messageDiv.className = 'error';
+                        messageDiv.innerHTML = '❌ Failed to send verification email.<br>⚠️ Please make sure the webhook server is running:<br><code>python payment_webhook.py</code>';
+                    }
+                }).catch(error => {
+                    // Fallback: Create account but warn about email
+                    const user = {
+                        email: email,
+                        name: name,
+                        verified: false,
+                        usage_stats: {
+                            total_sessions: 0,
+                            total_queries: 0
+                        },
+                        licenses: []
+                    };
+
+                    localStorage.setItem('phantom_user_pending', JSON.stringify(user));
+
+                    messageDiv.className = 'error';
+                    messageDiv.innerHTML = '⚠️ Account created but verification email failed to send.<br>❌ <strong>Webhook server not running!</strong><br><br>To receive verification emails:<br>1. Open terminal/command prompt<br>2. Navigate to project folder<br>3. Run: <code>python payment_webhook.py</code><br>4. Try signing up again<br><br>Or contact support for manual verification.';
+
+                    // Clear form
+                    document.getElementById('signupName').value = '';
+                    document.getElementById('signupEmail').value = '';
+                    document.getElementById('signupPassword').value = '';
+                    document.getElementById('signupConfirm').value = '';
+                });
         }
 
         function logout() {
