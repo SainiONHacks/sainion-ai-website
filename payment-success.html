@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - SainiON AI</title>
+    <link rel="icon" href="icon.ico" type="image/x-icon">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .success-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.2);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .success-icon {
+            font-size: 80px;
+            color: #00FF88;
+            margin-bottom: 20px;
+            animation: checkmark 0.6s ease;
+        }
+
+        @keyframes checkmark {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        h1 {
+            color: #00FF88;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #E0E0E0;
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: rgba(0, 255, 136, 0.1);
+            border: 2px solid rgba(0, 255, 136, 0.3);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            color: #888;
+            font-size: 14px;
+        }
+
+        .info-value {
+            color: #00FF88;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .license-box {
+            background: #1a1a2e;
+            border: 2px solid #00FF88;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .license-label {
+            color: #888;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .license-key {
+            color: #00FF88;
+            font-size: 24px;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            word-break: break-all;
+            margin: 10px 0;
+        }
+
+        .copy-btn {
+            background: #00FF88;
+            color: #000;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .copy-btn:hover {
+            background: #00FFAA;
+            transform: translateY(-2px);
+        }
+
+        .steps-box {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .steps-box h3 {
+            color: #00FF88;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin: 15px 0;
+        }
+
+        .step-number {
+            background: #00FF88;
+            color: #000;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .step-text {
+            color: #E0E0E0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: #00FF88;
+            color: #000;
+            border: none;
+            padding: 15px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: #00FFAA;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 255, 136, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: #00FF88;
+            border: 2px solid #00FF88;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .email-notice {
+            background: rgba(255, 193, 7, 0.1);
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ffc107;
+            font-size: 14px;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 255, 136, 0.3);
+            border-top-color: #00FF88;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        <h1>Payment Successful!</h1>
+        <p class="subtitle">Your license has been activated</p>
+
+        <div id="loadingState">
+            <div class="loading"></div>
+            <p style="color: #E0E0E0; margin-top: 10px;">Processing your order...</p>
+        </div>
+
+        <div id="successState" style="display: none;">
+            <!-- Order Info -->
+            <div class="info-box">
+                <div class="info-row">
+                    <span class="info-label">Order ID:</span>
+                    <span class="info-value" id="orderId">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Transaction ID:</span>
+                    <span class="info-value" id="transactionId">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Plan:</span>
+                    <span class="info-value" id="plan">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Amount Paid:</span>
+                    <span class="info-value" id="amount">-</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email:</span>
+                    <span class="info-value" id="email">-</span>
+                </div>
+            </div>
+
+            <!-- License Key -->
+            <div class="license-box">
+                <div class="license-label">🔑 Your License Key</div>
+                <div class="license-key" id="licenseKey">XXXX-XXXX-XXXX-XXXX</div>
+                <button class="copy-btn" onclick="copyLicense()">📋 Copy License Key</button>
+            </div>
+
+            <!-- Email Notice -->
+            <div class="email-notice">
+                📧 A confirmation email with your license key has been sent to <strong id="emailConfirm">-</strong>
+                <br>(Please check spam folder if not received)
+            </div>
+
+            <!-- Next Steps -->
+            <div class="steps-box">
+                <h3>✨ How to Activate</h3>
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-text">Download and install SainiON AI application from our website</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-text">Open the application and go to Settings → License</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-text">Paste your license key and click "Activate"</div>
+                </div>
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-text">Enjoy full access to AI assistance features!</div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div style="margin-top: 30px;">
+                <a href="dashboard.html" class="btn">🏠 Go to Dashboard</a>
+                <a href="index.html#download" class="btn btn-secondary">📥 Download App</a>
+            </div>
+
+            <p style="color: #888; font-size: 12px; margin-top: 20px;">
+                Need help? Contact support: sainionai@outlook.com
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Extract payment details from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const orderId = urlParams.get('order_id') || urlParams.get('orderId');
+        const transactionId = urlParams.get('transaction_id') || urlParams.get('txn_id') || urlParams.get('payment_id');
+        const email = urlParams.get('email');
+        const plan = urlParams.get('plan');
+        const amount = urlParams.get('amount');
+
+        // Simulate processing (in production, this would call backend API)
+        setTimeout(() => {
+            processPayment();
+        }, 2000);
+
+        function processPayment() {
+            // Generate license key (in production, this comes from backend)
+            const licenseKey = generateLicenseKey();
+
+            // Update UI
+            document.getElementById('loadingState').style.display = 'none';
+            document.getElementById('successState').style.display = 'block';
+
+            // Fill in details
+            document.getElementById('orderId').textContent = orderId || 'N/A';
+            document.getElementById('transactionId').textContent = transactionId || 'N/A';
+            document.getElementById('plan').textContent = plan || '3 Days Plan';
+            document.getElementById('amount').textContent = amount ? `₹${amount}` : '₹19';
+            document.getElementById('email').textContent = email || 'your-email@example.com';
+            document.getElementById('emailConfirm').textContent = email || 'your-email@example.com';
+            document.getElementById('licenseKey').textContent = licenseKey;
+
+            // Send email via backend (in production)
+            sendLicenseEmail(email, licenseKey, orderId, plan, amount);
+
+            // Save to localStorage for dashboard
+            saveLicenseToLocalStorage(licenseKey, plan, orderId);
+        }
+
+        function generateLicenseKey() {
+            // Simple license key generator (in production, use backend)
+            const segments = [];
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (let i = 0; i < 4; i++) {
+                let segment = '';
+                for (let j = 0; j < 4; j++) {
+                    segment += chars.charAt(Math.floor(Math.random() * chars.length));
+                }
+                segments.push(segment);
+            }
+            return segments.join('-');
+        }
+
+        function copyLicense() {
+            const licenseKey = document.getElementById('licenseKey').textContent;
+            navigator.clipboard.writeText(licenseKey).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✅ Copied!';
+                btn.style.background = '#4CAF50';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = '#00FF88';
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy. Please copy manually: ' + licenseKey);
+            });
+        }
+
+        function sendLicenseEmail(email, licenseKey, orderId, plan, amount) {
+            // NOTE: In production, this should call your backend API
+            // Backend will use user_manager.py or license_manager.py to:
+            // 1. Generate license key
+            // 2. Save to licenses.json (GitHub)
+            // 3. Send email via email_sender.py
+
+            console.log('Sending email to:', email);
+            console.log('License Key:', licenseKey);
+            console.log('Order ID:', orderId);
+
+            // For now, show console message
+            // In production: fetch('/api/send-license-email', { method: 'POST', body: JSON.stringify({...}) })
+        }
+
+        function saveLicenseToLocalStorage(licenseKey, plan, orderId) {
+            // Save for dashboard display
+            const licenses = JSON.parse(localStorage.getItem('phantom_licenses') || '[]');
+            licenses.push({
+                key: licenseKey,
+                plan: plan,
+                order_id: orderId,
+                activated_at: new Date().toISOString(),
+                status: 'active'
+            });
+            localStorage.setItem('phantom_licenses', JSON.stringify(licenses));
+        }
+    </script>
+</body>
+
+</html>
