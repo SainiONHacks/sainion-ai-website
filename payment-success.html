@@ -338,7 +338,7 @@
     <script>
         // Try to get order details from localStorage first (from website)
         const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder') || 'null');
-        
+
         // Also check URL parameters (for direct links)
         const urlParams = new URLSearchParams(window.location.search);
         let orderId = urlParams.get('order_id') || urlParams.get('orderId');
@@ -427,7 +427,7 @@
             // Call backend webhook to send license email
             // NOTE: Replace with your actual webhook URL after deployment
             const webhookUrl = 'http://localhost:5000/webhook/payment-success';
-            
+
             const paymentData = {
                 order_id: orderId,
                 transaction_id: `PayU-${Date.now()}`,
@@ -448,14 +448,14 @@
                 },
                 body: JSON.stringify(paymentData)
             })
-            .then(response => response.json())
-            .then(data => {
-                console.log('✅ License email sent:', data);
-            })
-            .catch(error => {
-                console.error('❌ Email sending failed:', error);
-                console.log('User will still see license key on screen');
-            });
+                .then(response => response.json())
+                .then(data => {
+                    console.log('✅ License email sent:', data);
+                })
+                .catch(error => {
+                    console.error('❌ Email sending failed:', error);
+                    console.log('User will still see license key on screen');
+                });
         }
 
         function saveLicenseToLocalStorage(licenseKey, plan, orderId) {

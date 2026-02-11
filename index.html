@@ -1337,7 +1337,7 @@
             // Check if user is registered and email verified
             // In production, this would check against backend database
             const isEmailVerified = checkEmailVerification(customerEmail);
-            
+
             if (!isEmailVerified) {
                 alert('❌ Email Not Verified!\n\nPlease verify your email address before making a purchase.\n\n1. Register/Login to your account\n2. Check your inbox for verification email\n3. Click verification link\n4. Then retry purchase\n\nOR continue as guest (license will still be sent to your email)');
                 // Allow guest purchase to continue
@@ -1388,7 +1388,7 @@
                     return true;
                 }
             }
-            
+
             // Check pending verification
             const pendingUser = localStorage.getItem('phantom_user_pending');
             if (pendingUser) {
@@ -1397,7 +1397,7 @@
                     return false; // User exists but not verified
                 }
             }
-            
+
             // New user / guest purchase
             return false;
         }
