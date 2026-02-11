@@ -385,8 +385,7 @@
                 paymentId: response.razorpay_payment_id || 'DEMO_' + Date.now(),
                 status: 'active'
             };
-            3 - days': 3 * 24 * 60 * 60 * 1000, // 3 days
-            '
+
             // Store purchase
             localStorage.setItem('currentLicense', JSON.stringify(purchaseData));
 
@@ -419,6 +418,7 @@
                 'demo': 6 * 60 * 60 * 1000, // 6 hours
                 'first-time': 24 * 60 * 60 * 1000, // 1 day
                 'daily': 24 * 60 * 60 * 1000, // 1 day
+                '3-days': 3 * 24 * 60 * 60 * 1000, // 3 days
                 '15-days': 15 * 24 * 60 * 60 * 1000, // 15 days
                 'monthly': 30 * 24 * 60 * 60 * 1000 // 30 days
             };
