@@ -760,8 +760,18 @@
                 return;
             }
 
-            // Simulate login (In production, verify against GitHub API)
-            // For demo, accept any email/password
+            // Check if user has pending verification
+            const pendingUser = localStorage.getItem('phantom_user_pending');
+            if (pendingUser) {
+                const pending = JSON.parse(pendingUser);
+                if (pending.email === email && !pending.verified) {
+                    messageDiv.className = 'error';
+                    messageDiv.innerHTML = '❌ Please verify your email first!<br>📧 Check your inbox for verification link.<br><a href="#" onclick="resendVerification(\'' + email + '\'); return false;" style="color:#00FF88;">Resend verification email</a>';
+                    return;
+                }
+            }
+
+            // Simulate login (In production, verify against GitHub API with verification check)
             messageDiv.className = 'success';
             messageDiv.textContent = '✅ Logging in...';
 
@@ -780,6 +790,11 @@
                 currentUser = user;
                 showDashboard();
             }, 1000);
+        }
+
+        function resendVerification(email) {
+            // NOTE: In production, call backend API to resend verification
+            alert('📧 Verification email sent to ' + email + '!\nPlease check your inbox (including spam folder).');
         }
 
         function signup() {
@@ -814,14 +829,17 @@
                 return;
             }
 
-            // Simulate signup
+            // Show verification requirement message
             messageDiv.className = 'success';
-            messageDiv.textContent = '✅ Creating account...';
+            messageDiv.textContent = '✅ Creating account and sending verification email...';
 
             setTimeout(() => {
+                // Note: In production, this should call backend API to create account
+                // For demo purposes, storing in localStorage (requires verification in production)
                 const user = {
                     email: email,
                     name: name,
+                    verified: false, // Email not verified yet
                     usage_stats: {
                         total_sessions: 0,
                         total_queries: 0
@@ -829,14 +847,18 @@
                     licenses: []
                 };
 
-                localStorage.setItem('phantom_user', JSON.stringify(user));
-                currentUser = user;
+                // Store unverified user
+                localStorage.setItem('phantom_user_pending', JSON.stringify(user));
 
-                messageDiv.textContent = '✅ Account created! Welcome!';
-                setTimeout(() => {
-                    showDashboard();
-                }, 1000);
-            }, 1000);
+                messageDiv.className = 'success';
+                messageDiv.innerHTML = '✅ Account created!<br>📧 Please check your email (' + email + ') to verify your account.<br>⚠️ You must verify your email before logging in.';
+
+                // Clear form
+                document.getElementById('signupName').value = '';
+                document.getElementById('signupEmail').value = '';
+                document.getElementById('signupPassword').value = '';
+                document.getElementById('signupConfirm').value = '';
+            }, 1500);
         }
 
         function logout() {
