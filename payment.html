@@ -278,31 +278,43 @@
             'monthly': {
                 name: '1 Month Plan',
                 price: 2000,
-                duration: '1 and payment button
+                duration: '1 Month Access',
+                buttonId: 'pl_SEtXRFrizzU5Wd',
+                features: ['Full Feature Access', 'All AI Models', 'Priority Support', 'Regular Updates', 'Best for Professional Use']
+            }
+        };
+
+        // Get plan from URL parameters
+        function getURLParameter(name) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(name);
+        }
+
+        // Load plan details and payment button
         function loadPlanDetails() {
-                const planType = getURLParameter('plan') || 'daily';
-        const plan = PLANS[planType] || PLANS['daily'];
+            const planType = getURLParameter('plan') || 'daily';
+            const plan = PLANS[planType] || PLANS['daily'];
 
-        document.getElementById('planName').textContent = plan.name;
-        document.getElementById('planPrice').textContent = `₹${plan.price}`;
-        document.getElementById('planDuration').textContent = plan.duration;
+            document.getElementById('planName').textContent = plan.name;
+            document.getElementById('planPrice').textContent = `₹${plan.price}`;
+            document.getElementById('planDuration').textContent = plan.duration;
 
-        const featuresList = document.getElementById('planFeatures');
-        featuresList.innerHTML = '';
-        plan.features.forEach(feature => {
-            const li = document.createElement('li');
-            li.textContent = feature;
-            featuresList.appendChild(li);
-        });
+            const featuresList = document.getElementById('planFeatures');
+            featuresList.innerHTML = '';
+            plan.features.forEach(feature => {
+                const li = document.createElement('li');
+                li.textContent = feature;
+                featuresList.appendChild(li);
+            });
 
-        // Load appropriate Razorpay button
-        loadPaymentButton(plan.buttonId, planType);
+            // Load appropriate Razorpay button
+            loadPaymentButton(plan.buttonId, planType);
 
-        // Store plan info for payment callback
-        sessionStorage.setItem('selectedPlan', JSON.stringify({
-            type: planType,
-            ...plan
-        }));
+            // Store plan info for payment callback
+            sessionStorage.setItem('selectedPlan', JSON.stringify({
+                type: planType,
+                ...plan
+            }));
         }
 
         // Load Razorpay payment button
