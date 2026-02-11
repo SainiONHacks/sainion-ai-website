@@ -336,13 +336,25 @@
     </div>
 
     <script>
-        // Extract payment details from URL
+        // Try to get order details from localStorage first (from website)
+        const pendingOrder = JSON.parse(localStorage.getItem('pendingOrder') || 'null');
+        
+        // Also check URL parameters (for direct links)
         const urlParams = new URLSearchParams(window.location.search);
-        const orderId = urlParams.get('order_id') || urlParams.get('orderId');
-        const transactionId = urlParams.get('transaction_id') || urlParams.get('txn_id') || urlParams.get('payment_id');
-        const email = urlParams.get('email');
-        const plan = urlParams.get('plan');
-        const amount = urlParams.get('amount');
+        let orderId = urlParams.get('order_id') || urlParams.get('orderId');
+        let transactionId = urlParams.get('transaction_id') || urlParams.get('txn_id') || urlParams.get('payment_id');
+        let email = urlParams.get('email');
+        let plan = urlParams.get('plan');
+        let amount = urlParams.get('amount');
+
+        // If we have pending order from localStorage, use that (most reliable)
+        if (pendingOrder) {
+            orderId = pendingOrder.orderId;
+            email = pendingOrder.email;
+            plan = pendingOrder.plan;
+            amount = pendingOrder.price ? pendingOrder.price.replace('₹', '') : amount;
+            transactionId = transactionId || `TXN-${Date.now()}`;
+        }
 
         // Simulate processing (in production, this would call backend API)
         setTimeout(() => {
@@ -359,18 +371,21 @@
 
             // Fill in details
             document.getElementById('orderId').textContent = orderId || 'N/A';
-            document.getElementById('transactionId').textContent = transactionId || 'N/A';
-            document.getElementById('plan').textContent = plan || '3 Days Plan';
-            document.getElementById('amount').textContent = amount ? `₹${amount}` : '₹19';
-            document.getElementById('email').textContent = email || 'your-email@example.com';
-            document.getElementById('emailConfirm').textContent = email || 'your-email@example.com';
+            document.getElementById('transactionId').textContent = transactionId || 'PayU-' + Date.now();
+            document.getElementById('plan').textContent = plan || (pendingOrder ? pendingOrder.plan : '3 Days Plan');
+            document.getElementById('amount').textContent = amount ? `₹${amount}` : (pendingOrder ? pendingOrder.price : '₹500');
+            document.getElementById('email').textContent = email || (pendingOrder ? pendingOrder.email : 'your-email@example.com');
+            document.getElementById('emailConfirm').textContent = email || (pendingOrder ? pendingOrder.email : 'your-email@example.com');
             document.getElementById('licenseKey').textContent = licenseKey;
 
-            // Send email via backend (in production)
-            sendLicenseEmail(email, licenseKey, orderId, plan, amount);
+            // Send email via backend
+            sendLicenseEmail(email || pendingOrder.email, licenseKey, orderId, plan || pendingOrder.plan, amount || pendingOrder.price);
 
             // Save to localStorage for dashboard
-            saveLicenseToLocalStorage(licenseKey, plan, orderId);
+            saveLicenseToLocalStorage(licenseKey, plan || pendingOrder.plan, orderId);
+
+            // Clear pending order after successful payment
+            localStorage.removeItem('pendingOrder');
         }
 
         function generateLicenseKey() {
@@ -404,18 +419,43 @@
         }
 
         function sendLicenseEmail(email, licenseKey, orderId, plan, amount) {
-            // NOTE: In production, this should call your backend API
-            // Backend will use user_manager.py or license_manager.py to:
-            // 1. Generate license key
-            // 2. Save to licenses.json (GitHub)
-            // 3. Send email via email_sender.py
+            if (!email || email === 'your-email@example.com') {
+                console.error('No valid email address for sending license');
+                return;
+            }
 
-            console.log('Sending email to:', email);
-            console.log('License Key:', licenseKey);
-            console.log('Order ID:', orderId);
+            // Call backend webhook to send license email
+            // NOTE: Replace with your actual webhook URL after deployment
+            const webhookUrl = 'http://localhost:5000/webhook/payment-success';
+            
+            const paymentData = {
+                order_id: orderId,
+                transaction_id: `PayU-${Date.now()}`,
+                email: email,
+                name: pendingOrder ? pendingOrder.name : 'Customer',
+                plan: plan,
+                amount: amount ? amount.replace('₹', '') : '500',
+                status: 'success',
+                timestamp: new Date().toISOString()
+            };
 
-            // For now, show console message
-            // In production: fetch('/api/send-license-email', { method: 'POST', body: JSON.stringify({...}) })
+            console.log('Sending license email...', paymentData);
+
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(paymentData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('✅ License email sent:', data);
+            })
+            .catch(error => {
+                console.error('❌ Email sending failed:', error);
+                console.log('User will still see license key on screen');
+            });
         }
 
         function saveLicenseToLocalStorage(licenseKey, plan, orderId) {

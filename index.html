@@ -1332,6 +1332,24 @@
             const customerEmail = document.getElementById('customerEmail').value;
             const selectedPlan = document.getElementById('selectedPlan').textContent;
             const selectedPrice = document.getElementById('selectedPrice').textContent;
+            const selectedDays = document.getElementById('selectedDays').textContent;
+
+            // Generate unique order ID
+            const timestamp = Date.now();
+            const orderId = `ORD-${timestamp}`;
+
+            // Save order details to localStorage (will be used after payment)
+            const orderData = {
+                orderId: orderId,
+                name: customerName,
+                email: customerEmail,
+                plan: selectedPlan,
+                price: selectedPrice,
+                days: selectedDays,
+                timestamp: new Date().toISOString(),
+                status: 'pending'
+            };
+            localStorage.setItem('pendingOrder', JSON.stringify(orderData));
 
             // Send email notification to admin
             fetch('https://formsubmit.co/ajax/nitinsaini077@gmail.com', {
@@ -1340,8 +1358,8 @@
             }).then(response => {
                 if (response.ok) {
                     closePurchaseForm();
-                    // Show QR code payment modal
-                    showPaymentQRCode(customerName, customerEmail, selectedPlan, selectedPrice);
+                    // Redirect to PayU payment
+                    redirectToPayment(orderData);
                 } else {
                     alert('❌ Failed to send request. Please try again or contact support.');
                 }
@@ -1350,59 +1368,43 @@
             });
         }
 
-        function showPaymentQRCode(name, email, plan, price) {
-            // Get payment settings from localStorage or use defaults
-            const paymentSettings = JSON.parse(localStorage.getItem('paymentSettings') || '{}');
-            const upiId = paymentSettings.upiId || 'yourpayment@upi';
-            const upiName = paymentSettings.upiName || 'SainiON AI';
-            const qrUrl = paymentSettings.qrUrl || `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa=${upiId}&pn=${encodeURIComponent(upiName)}&am=${price.replace('₹', '')}&cu=INR&tn=SainiON%20AI%20License`;
-            const contactEmail = paymentSettings.contactEmail || 'support@sainion-ai.com';
-
-            const qrModal = document.createElement('div');
-            qrModal.id = 'qrPaymentModal';
-            qrModal.className = 'modal';
-            qrModal.style.display = 'flex';
-            qrModal.innerHTML = `
-                <div class="modal-content" style="max-width: 600px; max-height: 90vh; overflow-y: auto; text-align: center;">
-                    <span class="modal-close" onclick="closeQRModal()">&times;</span>
-                    <h2 style="color:#00ff88; margin-bottom:20px;">💳 Complete Your Payment</h2>
-                    
-                    <div style="background: white; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                        <img src="${qrUrl}" 
-                             alt="Payment QR Code" 
-                             style="max-width: 250px; width: 100%; height: auto;">
-                        <p style="color:#000; margin-top:10px; font-weight:bold;">Scan with any UPI app</p>
+        function redirectToPayment(orderData) {
+            // Show loading message
+            const loadingDiv = document.createElement('div');
+            loadingDiv.style.cssText = 'position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); display:flex; justify-content:center; align-items:center; z-index:10000;';
+            loadingDiv.innerHTML = `
+                <div style="background:#1a1a2e; padding:40px; border-radius:20px; text-align:center; border:2px solid #00FF88;">
+                    <div style="font-size:48px; margin-bottom:20px;">💳</div>
+                    <h2 style="color:#00FF88; margin-bottom:15px;">Redirecting to Payment Gateway...</h2>
+                    <p style="color:#E0E0E0; margin-bottom:10px;">Please wait while we redirect you to secure payment page</p>
+                    <p style="color:#888; font-size:14px;">Order ID: ${orderData.orderId}</p>
+                    <div style="margin-top:20px;">
+                        <div style="width:50px; height:50px; border:4px solid rgba(0,255,136,0.3); border-top-color:#00FF88; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto;"></div>
                     </div>
-                    
-                    <div style="text-align:left; background: rgba(0,255,136,0.1); padding: 20px; border-radius: 10px; margin-bottom: 20px;">
-                        <p><strong>Order Details:</strong></p>
-                        <p>👤 Name: ${name}</p>
-                        <p>📧 Email: ${email}</p>
-                        <p>📦 Plan: ${plan}</p>
-                        <p>💰 Amount: ${price}</p>
-                    </div>
-                    
-                    <div style="background: rgba(255,193,7,0.1); padding: 15px; border-radius: 10px; border: 2px solid rgba(255,193,7,0.3); margin-bottom: 20px;">
-                        <p style="color: #ffc107; font-weight: bold;">⏳ After Payment:</p>
-                        <p style="color: #ccc; font-size: 14px; margin-top: 10px;">
-                            1. Take a screenshot of payment confirmation<br>
-                            2. Email proof to admin (check your confirmation email)<br>
-                            3. You'll receive your license key within 2-4 hours
-                        </p>
-                    </div>
-                    
-                    <p style="color:#888; font-size:12px; margin-bottom:15px;">
-                        UPI ID: <code style="background:rgba(0,255,136,0.2); padding:3px 8px; border-radius:3px;">${upiId}</code>
-                    </p>
-                    
-                    <button class="btn" onclick="closeQRModal()" style="width:100%;">
-                        ✅ I've Completed Payment
-                    </button>
-                    
-                    <p style="color:#888; font-size:12px; margin-top:15px;">
-                        Need help? Contact Support
-                    </p>
                 </div>
+            `;
+            document.body.appendChild(loadingDiv);
+
+            // Redirect to PayU payment link after 2 seconds
+            setTimeout(() => {
+                window.location.href = 'https://u.payu.in/zrYSQ2heCtBc';
+            }, 2000);
+        }
+
+        function showPaymentQRCode(name, email, plan, price) {
+            // Legacy QR Code function (kept for backward compatibility)
+            // Now redirects to PayU payment instead
+            redirectToPayment({
+                name: name,
+                email: email,
+                plan: plan,
+                price: price
+            });
+
+            <p style="color:#888; font-size:12px; margin-top:15px;">
+                Need help? Contact Support
+            </p>
+                </div >
             `;
             document.body.appendChild(qrModal);
         }
